@@ -27,6 +27,23 @@ const ui = {
 
 // PS position is controlled via CSS.
 
+const SKINS = import.meta.glob('./skins/*.css');
+
+const applySkin = async (name) => {
+    const load = SKINS[`./skins/${name}.css`];
+    if (!load) {
+        const available = Object.keys(SKINS).map((path) => path.match(/([^/]+)\.css$/)[1]);
+        console.warn(`Unknown skin "${name}". Available skins: ${available.join(', ') || 'none'}`);
+        return;
+    }
+
+    await load();
+    ui.gv.controller.classList.add(`skin-${name}`);
+};
+
+const skinParam = new URLSearchParams(window.location.search).get('skin');
+if (skinParam && ui.gv.controller) applySkin(skinParam);
+
 const updateUI = (gamepad) => {
     if (!gamepad) return;
 
